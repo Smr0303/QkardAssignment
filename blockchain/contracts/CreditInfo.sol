@@ -2,6 +2,9 @@
 pragma solidity ^0.8.9;
 
 error ALERADY_REGISTERED();
+error NOT_AUTHORISED_BY_OWNER();
+error NOT_OWNER();
+error NOT_REGISTERED();
 
 contract CreditInfo{
 
@@ -22,6 +25,7 @@ uint256 immutable i_creditLimit;
 
 mapping(address => Info) public creditInfo;
 mapping(address=> bool)  isAuthorised;
+mapping(address=> uint256) paymentHistory;
 
 
 constructor(address owner,uint256 creditLimit){
@@ -40,4 +44,61 @@ function addCreditInfo(uint256 _typeIndex) public {
   creditInfo[msg.sender] = person;
 }
 
+function updateCreditInfo(uint256 _typeIndex)public {
+if((isAuthorised[msg.sender] == false) ){
+    revert NOT_AUTHORISED_BY_OWNER();
+}
+if(creditInfo[msg.sender].IsPresent == false){
+  revert NOT_REGISTERED();
+}
+Info memory person = creditInfo[msg.sender] ;
+person._type = Type(_typeIndex);
+creditInfo[msg.sender] = person;
+}
+
+function authoriseUser (address _address) public {
+if((msg.sender != i_owner) ){
+    revert NOT_OWNER();
+}
+isAuthorised[_address] = true;
+}
+
+
+function updateCreditInfo_Owner(address _address,uint256 _creditScore ,uint256 _creditLimit,uint256 _typeIndex)public{
+if((msg.sender != i_owner) ){
+    revert NOT_OWNER();
+}
+Info memory  person ;
+person =Info(_creditScore,_creditLimit, Type(_typeIndex), block.timestamp,true); 
+creditInfo[_address] = person;
+}
+
+
+function accessCreditInfo(address _address) public view returns(Info memory){
+if((isAuthorised[msg.sender] == false) || (msg.sender != i_owner) ){
+    revert NOT_AUTHORISED_BY_OWNER();
+}
+if(creditInfo[_address].IsPresent == false){
+  revert NOT_REGISTERED();
+}
+return creditInfo[_address];
+}
+
+function calculateCreditscore(address _address) public {
+  if(msg.sender != i_owner){
+    revert NOT_OWNER();
+  }
+
+  Info memory  person = creditInfo[_address];
+  uint256 _creditScore = ((person.creditLimit/paymentHistory[_address])*10);
+  person.creditScore = _creditScore;
+  creditInfo[_address] = person;
+}
+
+function updatePaymentHistory(address _address,uint256 _paymentHistory) public{
+if(msg.sender != i_owner){
+    revert NOT_OWNER();
+  }
+paymentHistory[_address] = _paymentHistory;
+}
 }
