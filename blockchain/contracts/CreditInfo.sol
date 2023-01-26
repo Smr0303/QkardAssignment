@@ -95,7 +95,7 @@ if(creditInfo[_address].IsPresent == false){
 return creditInfo[_address];
 }
 
-function calculateCreditscore(address _address) public {
+function calculateCreditScore(address _address) public {
   if(msg.sender != i_owner){
     revert NOT_OWNER();
   }
@@ -105,6 +105,7 @@ function calculateCreditscore(address _address) public {
   if(paymentHistory[_address] == 0){
    _creditScore = 0;
   }
+  
   else{
    _creditScore=((person.creditLimit/paymentHistory[_address])*10);
   }
@@ -112,7 +113,7 @@ function calculateCreditscore(address _address) public {
   creditInfo[_address] = person;
 }
 
-function updatePaymentHistory(address _address,uint256 _paymentHistory) public{
+function updatePaymentHistory(address _address, uint256 _paymentHistory) public{
 if(msg.sender != i_owner){
     revert NOT_OWNER();
   }
