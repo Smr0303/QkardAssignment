@@ -23,9 +23,10 @@ struct Info{
 address immutable i_owner;
 uint256 immutable i_creditLimit;
 
-mapping(address => Info) public creditInfo;
-mapping(address=> bool)  isAuthorised;
-mapping(address=> uint256) paymentHistory;
+mapping(address => Info)  creditInfo;
+mapping(address=> bool)  public isAuthorised;
+mapping(address=> uint256) public paymentHistory;
+
 
 
 constructor(address owner,uint256 creditLimit){
@@ -74,9 +75,19 @@ creditInfo[_address] = person;
 }
 
 
-function accessCreditInfo(address _address) public view returns(Info memory){
-if((isAuthorised[msg.sender] == false) || (msg.sender != i_owner) ){
+function accessCreditInfo(address _address) public view returns(Info memory) {
+if((isAuthorised[msg.sender] == false)){
     revert NOT_AUTHORISED_BY_OWNER();
+}
+if(creditInfo[_address].IsPresent == false){
+  revert NOT_REGISTERED();
+}
+return creditInfo[_address];
+}
+
+function accessCreditInfo_Owner(address _address) public view returns(Info memory) {
+if((msg.sender != i_owner)){
+    revert NOT_OWNER();
 }
 if(creditInfo[_address].IsPresent == false){
   revert NOT_REGISTERED();
@@ -90,7 +101,13 @@ function calculateCreditscore(address _address) public {
   }
 
   Info memory  person = creditInfo[_address];
-  uint256 _creditScore = ((person.creditLimit/paymentHistory[_address])*10);
+  uint256 _creditScore;
+  if(paymentHistory[_address] == 0){
+   _creditScore = 0;
+  }
+  else{
+   _creditScore=((person.creditLimit/paymentHistory[_address])*10);
+  }
   person.creditScore = _creditScore;
   creditInfo[_address] = person;
 }
