@@ -1,0 +1,12 @@
+{
+    "31337": {
+        "creditInfo": {
+            "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+        }
+    },
+    "5":{
+        "creditInfo": {
+            "address": "0xCB03fA855281280c12A01129D74139bc3267aa3A"
+        } 
+    }
+}
