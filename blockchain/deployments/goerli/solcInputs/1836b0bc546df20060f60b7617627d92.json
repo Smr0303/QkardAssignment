@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/CreditInfo.sol": {
+      "content": "//SPDX-License-Identifier:MIT\npragma solidity ^0.8.9;\n\nerror ALERADY_REGISTERED();\nerror NOT_AUTHORISED_BY_OWNER();\nerror NOT_OWNER();\nerror NOT_REGISTERED();\n\ncontract CreditInfo{\n\nenum Type{\n    Individual,\n    Business\n}\nstruct Info{\n    uint256 creditScore;\n    uint256 creditLimit;\n    Type _type;\n    uint256 creditInquiry;   \n    bool  IsPresent;\n}\n\naddress immutable i_owner;\nuint256 immutable i_creditLimit;\n\nmapping(address => Info)  creditInfo;\nmapping(address=> bool)  public isAuthorised;\nmapping(address=> uint256) public paymentHistory;\n\n\n\nconstructor(address owner,uint256 creditLimit){\n    i_owner = owner;\n    i_creditLimit= creditLimit;\n}\n\n//Store the information of credit individuals \nfunction addCreditInfo(uint256 _typeIndex) public {\n  if(creditInfo[msg.sender].IsPresent == true ){\n    revert ALERADY_REGISTERED();\n  }\n  \n  Info memory  person ;\n  person =Info(0, i_creditLimit, Type(_typeIndex), block.timestamp,true); \n  creditInfo[msg.sender] = person;\n}\n\nfunction updateCreditInfo(uint256 _typeIndex)public {\nif((isAuthorised[msg.sender] == false) ){\n    revert NOT_AUTHORISED_BY_OWNER();\n}\nif(creditInfo[msg.sender].IsPresent == false){\n  revert NOT_REGISTERED();\n}\nInfo memory person = creditInfo[msg.sender] ;\nperson._type = Type(_typeIndex);\ncreditInfo[msg.sender] = person;\n}\n\nfunction authoriseUser (address _address) public {\nif((msg.sender != i_owner) ){\n    revert NOT_OWNER();\n}\nisAuthorised[_address] = true;\n}\n\n\nfunction updateCreditInfo_Owner(address _address,uint256 _creditScore ,uint256 _creditLimit,uint256 _typeIndex)public{\nif((msg.sender != i_owner) ){\n    revert NOT_OWNER();\n}\nInfo memory  person ;\nperson =Info(_creditScore,_creditLimit, Type(_typeIndex), block.timestamp,true); \ncreditInfo[_address] = person;\n}\n\n\nfunction accessCreditInfo(address _address) public view returns(Info memory) {\nif((isAuthorised[msg.sender] == false)){\n    revert NOT_AUTHORISED_BY_OWNER();\n}\nif(creditInfo[_address].IsPresent == false){\n  revert NOT_REGISTERED();\n}\nreturn creditInfo[_address];\n}\n\nfunction accessCreditInfo_Owner(address _address) public view returns(Info memory) {\nif((msg.sender != i_owner)){\n    revert NOT_OWNER();\n}\nif(creditInfo[_address].IsPresent == false){\n  revert NOT_REGISTERED();\n}\nreturn creditInfo[_address];\n}\n\nfunction calculateCreditScore(address _address) public {\n  if(msg.sender != i_owner){\n    revert NOT_OWNER();\n  }\n\n  Info memory  person = creditInfo[_address];\n  uint256 _creditScore;\n  if(paymentHistory[_address] == 0){\n   _creditScore = 0;\n  }\n  \n  else{\n   _creditScore=((person.creditLimit/paymentHistory[_address])*10);\n  }\n  person.creditScore = _creditScore;\n  creditInfo[_address] = person;\n}\n\nfunction updatePaymentHistory(address _address, uint256 _paymentHistory) public{\nif(msg.sender != i_owner){\n    revert NOT_OWNER();\n  }\npaymentHistory[_address] = _paymentHistory;\n}\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
