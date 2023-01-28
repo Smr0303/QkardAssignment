@@ -12,20 +12,20 @@ function UserDashboard({account,provider,CreditContract}) {
  const [selectedOption, setSelectedOption] = useState("Individual");
  /*Credit Info fields */
  const [status,setStatus]= useState(false);
- const [creditScore,setCreditScore] = useState("");
+ const [creditScore,setCreditScore] = useState(null);
  const [creditLimit, setCreditLimit] = useState("");
  const [type, setType] = useState("");
  const [present, setPresent] = useState("");
 
 
  /*Modal fields */
- const [showModal, setShowModal] = useState(true);
+ const [showModal, setShowModal] = useState(false);
 
  /*dropdown options */
  const options =["Individual","Business"];
 
  const handleClose = () => setShowModal(false);
- const handleShow = () => setShowModal(true);
+ 
 
 
 const handleSubmit = async(e)=>{
@@ -60,6 +60,17 @@ const accessCreditInfo= async()=>{
     }
 }
 }
+
+const handleAccessInfo=async(e)=>{
+e.preventDefault();
+if(status){
+  setShowModal(true);
+}
+else{
+  alert("First get Authorisation from Owner");
+}
+}
+
 
 useEffect(()=>{
 accessCreditInfo();
@@ -98,20 +109,36 @@ accessCreditInfo();
     </Button>
     }
   </Form>
-  <Button variant="secondary"  onClick={accessCreditInfo}>
-      accessInfo
+  <Button variant="secondary"  onClick={handleAccessInfo}>
+      AccessInfo
     </Button>
     <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>User Info</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Body>
+          <Form>
+    <Form.Group className="mb-3" controlId="formBasicEmail">
+      <Form.Label>User Address</Form.Label>
+      <Form.Control type="input" value={account ? account : "Your Address"} placeholder="" disabled/>
+    </Form.Group>
+    <Form.Group className="mb-3" controlId="formBasicEmail">
+      <Form.Label>Credit Score</Form.Label>
+      <Form.Control type="input" value={creditScore ? creditScore : "0"} placeholder="" disabled/>
+    </Form.Group>
+    <Form.Group className="mb-3" controlId="formBasicEmail">
+      <Form.Label>Credit Limit</Form.Label>
+      <Form.Control type="input" value={creditLimit ? creditLimit : "Your Address"} placeholder="" disabled/>
+    </Form.Group>
+    <Form.Group className="mb-3" controlId="formBasicEmail">
+      <Form.Label>User Type</Form.Label>
+      <Form.Control type="input" value={type ? type : "Your Address"} placeholder="" disabled/>
+    </Form.Group>
+  </Form>
+  </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
           </Button>
         </Modal.Footer>
       </Modal>

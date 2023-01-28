@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import { ToastContainer } from 'react-toastify';
 import abi from "./constants/abi.json";
 import config from "./constants/config.json";
 import OwnerDashboard from "./components/OwnerDashboard";
@@ -36,6 +37,7 @@ function App() {
         });
         const account = ethers.utils.getAddress(accounts[0]);
         setAccount(account);
+        window.location.reload();
       });
     }
   };
@@ -46,7 +48,6 @@ function App() {
   return (
     <div className="App">
       <Nav account={account} setAccount={setAccount} />
-      {console.log(account,ownerAddress)}
       {(account == ownerAddress)?
       <OwnerDashboard
       account={account}
