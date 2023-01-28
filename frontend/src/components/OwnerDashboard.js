@@ -54,15 +54,20 @@ function OwnerDashboard({ account, provider, CreditContract }) {
   };
 
   const handleCreditLimit = async (e) => {
-     e.preventDefault();
-     const signer = await provider.getSigner();
-     const typeValue = (type ==="Business")?1:0;
-     const tx = await CreditContract.connect(signer).updateCreditInfo_Owner(address,creditScore,creditLimit,typeValue);
-     toast.success("Updating... Please remain stanby")
-     const receipt = await tx.wait();
-     if(receipt) {
+    e.preventDefault();
+    const signer = await provider.getSigner();
+    const typeValue = type === "Business" ? 1 : 0;
+    const tx = await CreditContract.connect(signer).updateCreditInfo_Owner(
+      address,
+      creditScore,
+      creditLimit,
+      typeValue
+    );
+    toast.success("Updating... Please remain stanby");
+    const receipt = await tx.wait();
+    if (receipt) {
       toast("Successfully updated all the Info");
-     }
+    }
   };
   const handlePaymentHistory = async (e) => {
     const signer = await provider.getSigner();
@@ -91,7 +96,6 @@ function OwnerDashboard({ account, provider, CreditContract }) {
       toast("Credit score Updated");
     }
   };
-
 
   return (
     <div>
@@ -180,11 +184,7 @@ function OwnerDashboard({ account, provider, CreditContract }) {
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>User Type</Form.Label>
-              <Form.Control
-                type="input"
-                value={type}
-                disabled
-              />
+              <Form.Control type="input" value={type} disabled />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Payment Count</Form.Label>

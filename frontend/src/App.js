@@ -11,7 +11,6 @@ function App() {
   const [account, setAccount] = useState(null);
   const [provider, setProvider] = useState(null);
   const [CreditContract, setCreditContract] = useState(null);
-  const ownerAddress = "0x1d7803057f8cf1f5175B6ea0c3B268138485d714";
 
   const loadBlockchainData = async () => {
     if (typeof window.ethereum === "undefined") {
@@ -21,15 +20,15 @@ function App() {
       setProvider(provider);
 
       const network = await provider.getNetwork();
-      
+
       const creditInfo = await new ethers.Contract(
         config[network.chainId].creditInfo.address,
         abi,
         provider
-        );
-        setCreditContract(creditInfo);
-        
-        //On account change automatically update the account
+      );
+      setCreditContract(creditInfo);
+
+      //On account change automatically update the account
       window.ethereum.on("accountsChanged", async () => {
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts",
@@ -46,18 +45,21 @@ function App() {
 
   return (
     <div className="App">
+      {console.log(process.env.REACT_APP_OWNER_ADDRESS)}
       <Nav account={account} setAccount={setAccount} />
-      {(account == ownerAddress)?
-      <OwnerDashboard
-      account={account}
-        provider={provider}
-        CreditContract={CreditContract}/>:
-      <UserDashboard
-        account={account}
-        provider={provider}
-        CreditContract={CreditContract}
-      />
-  }
+      {account == process.env.REACT_APP_OWNER_ADDRESS ? (
+        <OwnerDashboard
+          account={account}
+          provider={provider}
+          CreditContract={CreditContract}
+        />
+      ) : (
+        <UserDashboard
+          account={account}
+          provider={provider}
+          CreditContract={CreditContract}
+        />
+      )}
     </div>
   );
 }
