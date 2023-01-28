@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import React,{useState,useEffect} from 'react'
-import {Form,Button,Dropdown,Modal, Toast} from 'react-bootstrap';
+import {Form,Button,Modal, Toast} from 'react-bootstrap';
 import{toast} from 'react-toastify';
 
 
@@ -8,7 +8,6 @@ import{toast} from 'react-toastify';
 function UserDashboard({account,provider,CreditContract}) {
 
   /*Form-1 fields */
- const[address,setAddress] = useState(" ");
  const [selectedOption, setSelectedOption] = useState("Individual");
  /*Credit Info fields */
  const [status,setStatus]= useState(false);
@@ -27,17 +26,6 @@ function UserDashboard({account,provider,CreditContract}) {
  const handleClose = () => setShowModal(false);
  
 
-
-const handleSubmit = async(e)=>{
-  e.preventDefault();
-  await setAddress(account);
-  const signer= await provider.getSigner();
- const tx = await CreditContract.connect(signer).addCreditInfo(1); 
- const receipt = await tx.wait();
- console.log(receipt);
-}
-
-
 const accessCreditInfo= async()=>{
   if(account){
     const signer = await provider.getSigner();
@@ -54,10 +42,6 @@ const accessCreditInfo= async()=>{
       setPresent(isPresent);
       setType(type);
     }
-    else{
-      alert(1);
-      toast.warn("This account is not authorized first authorise by owner to access credit info");
-    }
 }
 }
 
@@ -67,14 +51,42 @@ if(status){
   setShowModal(true);
 }
 else{
-  alert("First get Authorisation from Owner");
+  toast.warn("First get Authorisation from Owner");
 }
+}
+
+const handleSubmit = async(e)=>{
+  e.preventDefault();
+ const signer= await provider.getSigner();
+ const typeValue =( (selectedOption == "Individual")?0:1);
+ console.log(typeValue);
+ const tx = await CreditContract.connect(signer).addCreditInfo(typeValue); 
+ const receipt = await tx.wait();
+ if(receipt){
+  toast.success("User Registered");
+ }
+}
+
+const handleUpdate =async(e)=>{
+  e.preventDefault();
+  if(selectedOption === type){
+   toast.warn("Same as previous Info");
+  }
+  else{
+    const signer= await provider.getSigner();
+    const typeValue =( (selectedOption == "Individual")?0:1);
+    console.log(typeValue);
+    const tx = await CreditContract.connect(signer).updateCreditInfo(typeValue);
+    const receipt = await tx.wait();
+    if(receipt){
+    toast("Successfuly Updated");
+   }
+  }
 }
 
 
 useEffect(()=>{
 accessCreditInfo();
-
 },[account])
 
   return (
@@ -101,15 +113,22 @@ accessCreditInfo();
       </label>
     </Form.Group>
     {status?
-    <Button variant="primary" type="submit" onClick={handleSubmit}>
+    <Button variant="primary" style={{ padding: '10px 20px',
+    margin: '10px 20px',
+    width: "20vw" }} type="submit" onClick={handleUpdate}>
      Update
     </Button>:
-    <Button variant="primary" type="submit" onClick={handleSubmit}>
+    <Button variant="primary" style={{ padding: '10px 20px',
+    margin: '10px 20px',
+    width: "20vw" }}  
+     type="submit" onClick={handleSubmit}>
       Submit
     </Button>
     }
   </Form>
-  <Button variant="secondary"  onClick={handleAccessInfo}>
+  <Button variant="secondary" style={{ padding: '10px 20px',
+margin: '10px 20px',
+width: "20vw" }} onClick={handleAccessInfo}>
       AccessInfo
     </Button>
     <Modal show={showModal} onHide={handleClose}>

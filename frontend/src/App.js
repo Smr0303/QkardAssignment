@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { ToastContainer } from 'react-toastify';
 import abi from "./constants/abi.json";
 import config from "./constants/config.json";
 import OwnerDashboard from "./components/OwnerDashboard";
