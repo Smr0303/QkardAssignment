@@ -48,7 +48,10 @@ function App() {
       <Nav account={account} setAccount={setAccount} />
       {console.log(account,ownerAddress)}
       {(account == ownerAddress)?
-      <OwnerDashboard/>:
+      <OwnerDashboard
+      account={account}
+        provider={provider}
+        CreditContract={CreditContract}/>:
       <UserDashboard
         account={account}
         provider={provider}
